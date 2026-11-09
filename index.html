@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#A3212F">
+<title>Calculadora de Churrasco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap">
+<style>
+:root{
+  --bg:#E9ECE4; --card:#F8F9F4; --ink:#1E2A24; --mute:#5C6A62; --line:#C9CEC2;
+  --red:#A3212F; --on-red:#fff; --chip:#DDE2D6;
+  --head:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#141819; --card:#1D2326; --ink:#E8ECE6; --mute:#9AA79F; --line:#34403A;
+    --red:#E0525F; --on-red:#1A0A0C; --chip:#2A3338; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141819; --card:#1D2326; --ink:#E8ECE6; --mute:#9AA79F; --line:#34403A;
+  --red:#E0525F; --on-red:#1A0A0C; --chip:#2A3338; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 var(--body);-webkit-tap-highlight-color:transparent}
+main{max-width:980px;margin:0 auto;padding:20px 16px 40px}
+h1{font:800 clamp(30px,7vw,46px)/1 var(--head);margin:8px 0 6px;letter-spacing:-.02em}
+.sub{color:var(--mute);margin:0 0 22px;max-width:46ch}
+.grid{display:grid;gap:18px}
+@media(min-width:820px){.grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}}
+.panel{background:var(--card);border-radius:14px;padding:18px;border:1px solid var(--line)}
+h2{font:700 19px/1.2 var(--head);margin:0 0 12px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.row:last-child{border-bottom:0}
+.row small{display:block;color:var(--mute);font-size:13px}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:42px;height:42px;border-radius:10px;border:1.5px solid var(--red);background:transparent;color:var(--red);font:700 22px/1 var(--head);cursor:pointer}
+.step button:active{background:var(--red);color:var(--on-red)}
+.step output{min-width:34px;text-align:center;font:800 22px var(--head)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button,.chip{border:1.5px solid transparent;background:var(--chip);color:var(--ink);border-radius:999px;padding:9px 14px;font:600 14px var(--body);cursor:pointer}
+.seg button[aria-pressed="true"],.chip[aria-pressed="true"]{background:var(--red);color:var(--on-red)}
+button:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.label{font:600 14px var(--body);color:var(--mute);margin:14px 0 8px}
+.ticket h2{display:flex;justify-content:space-between;align-items:baseline}
+.ticket .total{font:800 30px var(--head);color:var(--red)}
+.grp{font:700 15px var(--head);margin:16px 0 4px;color:var(--red)}
+.line{display:flex;align-items:baseline;gap:8px;padding:5px 0}
+.line .dots{flex:1;border-bottom:2px dotted var(--line);transform:translateY(-4px)}
+.line b{font-weight:700;white-space:nowrap}
+.line span:first-child{min-width:0}
+.line em{font-style:normal;color:var(--mute);font-size:13px}
+.actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn{flex:1;min-width:150px;border:0;border-radius:12px;padding:14px;background:var(--red);color:var(--on-red);font:700 16px var(--head);cursor:pointer}
+.btn.alt{background:transparent;color:var(--red);border:1.5px solid var(--red)}
+.note{color:var(--mute);font-size:13px;margin:14px 0 0}
+@media (prefers-reduced-motion:no-preference){.total{transition:opacity .15s}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Calculadora de churrasco</h1>
+  <p class="sub">Diga quantas pessoas vêm e veja o que comprar: carnes, acompanhamentos, carvão e bebidas.</p>
+
+  <div class="grid">
+    <section class="panel" aria-label="Convidados">
+      <h2>Quem vem?</h2>
+      <div class="row"><div>Homens<small>cerca de 400 g de carne</small></div><div class="step" data-k="h"></div></div>
+      <div class="row"><div>Mulheres<small>cerca de 300 g de carne</small></div><div class="step" data-k="m"></div></div>
+      <div class="row"><div>Crianças<small>cerca de 150 g de carne</small></div><div class="step" data-k="c"></div></div>
+      <div class="row"><div>Adultos que bebem cerveja</div><div class="step" data-k="b"></div></div>
+
+      <div class="label">Apetite da turma</div>
+      <div class="seg" id="app">
+        <button data-v="0.8" aria-pressed="false">Leve</button>
+        <button data-v="1" aria-pressed="true">Normal</button>
+        <button data-v="1.25" aria-pressed="false">Pesado</button>
+      </div>
+
+      <div class="label">O que vai na grelha</div>
+      <div class="seg" id="meats">
+        <button class="chip" data-k="boi" aria-pressed="true">Boi</button>
+        <button class="chip" data-k="lin" aria-pressed="true">Linguiça</button>
+        <button class="chip" data-k="fra" aria-pressed="true">Frango</button>
+        <button class="chip" data-k="por" aria-pressed="false">Porco</button>
+        <button class="chip" data-k="que" aria-pressed="true">Queijo coalho</button>
+      </div>
+    </section>
+
+    <section class="panel ticket" aria-live="polite">
+      <h2><span>Lista de compras</span><span class="total" id="total">0 kg</span></h2>
+      <div id="list"></div>
+      <div class="actions">
+        <button class="btn" id="copy">Copiar lista</button>
+        <button class="btn alt" id="share">Compartilhar</button>
+      </div>
+      <p class="note">Quantidades aproximadas, arredondadas para facilitar a compra. Ajuste o apetite se a turma costuma sobrar ou faltar.</p>
+    </section>
+  </div>
+</main>
+
+<script>
+(function(){
+  var S={h:4,m:3,c:2,b:3,ap:1,meats:{boi:1,lin:1,fra:1,por:0,que:1}};
+  try{var saved=JSON.parse(localStorage.getItem("churrasco")||"null");if(saved&&saved.meats)S=saved;}catch(e){}
+  var W={boi:.5,lin:.15,fra:.2,por:.1,que:.05};
+  var N={boi:"Boi (picanha, maminha, costela)",lin:"Linguiça",fra:"Frango (coxa e sobrecoxa)",por:"Porco (pancetta, bisteca)",que:"Queijo coalho"};
+  var nf=new Intl.NumberFormat("pt-BR",{maximumFractionDigits:1});
+  function kg(x){return x<1?(Math.round(x*1000/50)*50)+" g":nf.format(Math.round(x*10)/10)+" kg";}
+  function lt(x){return nf.format(Math.round(x*2)/2)+" L";}
+  var text="";
+
+  function save(){try{localStorage.setItem("churrasco",JSON.stringify(S));}catch(e){}}
+
+  function render(){
+    document.querySelectorAll(".step").forEach(function(el){
+      var k=el.dataset.k;
+      el.innerHTML='<button type="button" aria-label="Diminuir">−</button><output>'+S[k]+'</output><button type="button" aria-label="Aumentar">+</button>';
+      var bt=el.querySelectorAll("button");
+      bt[0].onclick=function(){S[k]=Math.max(0,S[k]-1);if(k!=="b")clampB();update();};
+      bt[1].onclick=function(){S[k]=Math.min(200,S[k]+1);update();};
+    });
+    document.querySelectorAll("#app button").forEach(function(b){b.setAttribute("aria-pressed",String(parseFloat(b.dataset.v)===S.ap));});
+    document.querySelectorAll("#meats button").forEach(function(b){b.setAttribute("aria-pressed",String(!!S.meats[b.dataset.k]));});
+    calc();
+  }
+  function clampB(){var ad=S.h+S.m;if(S.b>ad)S.b=ad;}
+  function update(){clampB();save();render();}
+
+  document.querySelectorAll("#app button").forEach(function(b){b.onclick=function(){S.ap=parseFloat(b.dataset.v);update();};});
+  document.querySelectorAll("#meats button").forEach(function(b){b.onclick=function(){
+    S.meats[b.dataset.k]=S.meats[b.dataset.k]?0:1;
+    if(!Object.keys(S.meats).some(function(k){return S.meats[k];}))S.meats[b.dataset.k]=1;
+    update();};});
+
+  function calc(){
+    var ad=S.h+S.m, pp=ad+S.c;
+    var carne=(S.h*.4+S.m*.3+S.c*.15)*S.ap;
+    var sel=Object.keys(W).filter(function(k){return S.meats[k];});
+    var sum=sel.reduce(function(a,k){return a+W[k];},0);
+    var L=[],out=[];
+    function g(t){L.push({g:t});out.push("\n*"+t+"*");}
+    function i(n,v,note){L.push({n:n,v:v,note:note});out.push("• "+n+": "+v);}
+
+    document.getElementById("total").textContent=pp?kg(carne):"0 kg";
+    if(!pp){document.getElementById("list").innerHTML='<p class="note">Adicione pelo menos uma pessoa para começar.</p>';text="";return;}
+
+    g("Carnes");
+    sel.forEach(function(k){i(N[k],kg(carne*W[k]/sum));});
+    g("Acompanhamentos");
+    i("Pão de alho",Math.ceil(ad*2+S.c)+" unid.");
+    i("Farofa",kg(pp*.05));
+    i("Vinagrete",kg(pp*.06));
+    i("Arroz (cru)",kg(pp*.07));
+    g("Fogo");
+    var carvao=Math.max(1,Math.ceil(carne*1.0*2)/2);
+    i("Carvão",nf.format(carvao)+" kg");
+    i("Sal grosso",Math.max(50,Math.round(carne*10/50)*50)+" g");
+    g("Bebidas");
+    var cerv=S.b*1.2;
+    if(S.b)i("Cerveja",lt(cerv),Math.ceil(cerv/.35)+" latas de 350 ml");
+    var refri=ad*.4+S.c*.6;
+    i("Refrigerante e suco",lt(refri));
+    i("Água",lt(pp*.3));
+    i("Gelo",kg(pp*.5));
+
+    var h="";
+    L.forEach(function(r){
+      if(r.g){h+='<div class="grp">'+r.g+'</div>';}
+      else{h+='<div class="line"><span>'+r.n+(r.note?' <em>('+r.note+')</em>':'')+'</span><span class="dots"></span><b>'+r.v+'</b></div>';}
+    });
+    document.getElementById("list").innerHTML=h;
+    text="*Churrasco para "+pp+" pessoas*"+out.join("\n");
+  }
+
+  document.getElementById("copy").onclick=function(){
+    var btn=this;
+    function ok(){btn.textContent="Lista copiada";setTimeout(function(){btn.textContent="Copiar lista";},1800);}
+    try{navigator.clipboard.writeText(text).then(ok,fallback);}catch(e){fallback();}
+    function fallback(){var t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();try{document.execCommand("copy");ok();}catch(e){}document.body.removeChild(t);}
+  };
+  document.getElementById("share").onclick=function(){
+    if(navigator.share){navigator.share({title:"Lista do churrasco",text:text}).catch(function(){});}
+    else{document.getElementById("copy").click();}
+  };
+
+  render();
+})();
+</script>
+</body>
+</html>
